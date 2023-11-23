@@ -1,0 +1,31 @@
+parameters:
+  - name: connectorFile
+    default: path/to/connector.yml
+  - name: action
+    default: resume
+    values:
+      - resume
+      - pause
+
+name: $(date:yyyyMMdd)$(rev:.r) - $(build.sourceBranch) - ${{ replace(replace(parameters.connectorFile,'/','_'),'\','_') }}
+
+trigger: none
+
+resources:
+  repositories:
+    - repository: kafka-sharedTemplates
+      name: hn-gtsdevops/kafka-sharedTemplates
+      endpoint: hn-gtsdevops
+      type: github
+      ref: feature/pauseConnector
+
+    - repository: common-sharedTemplates
+      name: hn-gtsdevops/common-sharedTemplates
+      endpoint: hn-gtsdevops
+      type: github
+
+extends: 
+  template: extension/kafka/pause-kafka-sm-connector.yml@kafka-sharedTemplates
+  parameters:
+    yamlFile: ${{ parameters.connectorFile }}
+    action: ${{ parameters.action }}

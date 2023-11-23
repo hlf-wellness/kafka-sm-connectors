@@ -1,0 +1,24 @@
+parameters:
+  - name: smConnectorYamlFile
+    default: path/to/connector.yml
+
+name: $(date:yyyyMMdd)$(rev:.r) - $(SourceBranchName) - ${{ replace(replace(parameters.smConnectorYamlFile,'/','_'),'\','_') }}
+
+trigger: none
+
+resources:
+  repositories:
+    - repository: kafka-sharedTemplates
+      name: hn-gtsdevops/kafka-sharedTemplates
+      endpoint: hn-gtsdevops
+      type: github
+      
+    - repository: common-sharedTemplates
+      name: hn-gtsdevops/common-sharedTemplates
+      endpoint: hn-gtsdevops
+      type: github
+
+extends: 
+  template: /extension/kafka/delete-kafka-sm-connector.yml@kafka-sharedTemplates
+  parameters:
+    yamlFile: ${{ parameters.smConnectorYamlFile }}
